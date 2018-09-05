@@ -96,7 +96,7 @@ def CalcField(g, per, numPer):
 if __name__=="__main__":
 
     #General Undulator Parameters
-    gap = 20; numPer = 2; per = 46; gapOffset = 1
+    gap = 20; numPer = 10; per = 46; gapOffset = 1
 
     #Pole Parameters
     lp = [45,5,25]; np = [2,2,5]; cp = [1,0,1]

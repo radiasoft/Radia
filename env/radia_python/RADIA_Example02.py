@@ -7,7 +7,8 @@
 
 from __future__ import print_function #Python 2.7 compatibility
 import radia as rad
-from uti_plot import *
+import uti_plot
+import numpy as np
 
 print('RADIA Python Example #2:')
 print('This example consists in the creation of a set of racetrack and circular coils,')
@@ -47,14 +48,16 @@ def BuildGeometry():
 def CalcField(g):
 
     #Vertical Magnetic Field vs Longitudinal Position
-    yMin = 0; yMax = 300; ny = 301
+    yMin = 0 
+    yMax = 300
+    ny = 301
     yStep = (yMax - yMin)/(ny - 1)
-    xc = 0; zc = 0
-    y = yMin
-    Points = []
-    for i in range(ny):
-        Points.append([xc,y,zc])
-        y += yStep
+    xc = np.zeros(ny - 1)
+    zc = np.zeros(ny - 1)
+    y = np.arange(0, (ny - 1) * yStep, yStep)
+
+    Points = np.column_stack([xc, y, zc])
+    
     BzVsY = rad.Fld(g, 'bz', Points)
 
     #Vertical Magnetic Field Integral (along Longitudinal Position) vs Horizontal Position
@@ -63,6 +66,7 @@ def CalcField(g):
     zc = 0
     x = xMin
     IBzVsX = []
+
     for i in range(ny):
         IBzVsX.append(rad.FldInt(g, 'inf', 'ibz', [x,-300,zc], [x,300,zc]))
         x += xStep
@@ -83,9 +87,9 @@ if __name__=="__main__":
     BzVsY, MeshY, IBzVsX, MeshX = CalcField(g)
 
     #Plot the Results
-    uti_plot1d(BzVsY, MeshY, ['Longitudinal Position [mm]', 'Bz [T]', 'Vertical Magnetic Field'])
-    uti_plot1d(IBzVsX, MeshX, ['Horizontal Position [mm]', 'Integral of Bz [T.mm]', 'Vertical Magnetic Field Integral'])
+    uti_plot.uti_plot1d(BzVsY, MeshY, ['Longitudinal Position [mm]', 'Bz [T]', 'Vertical Magnetic Field'])
+    uti_plot.uti_plot1d(IBzVsX, MeshX, ['Horizontal Position [mm]', 'Integral of Bz [T.mm]', 'Vertical Magnetic Field Integral'])
     
-    uti_plot_show() #show all graphs (and block further execution, if any)
+    uti_plot.uti_plot_show() #show all graphs (and block further execution, if any)
 
 
