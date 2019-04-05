@@ -200,19 +200,19 @@ The rectangular slices are assumed to be parallel to the XY plane.
 */
 EXP int CALL RadObjMltExtRtg(int* n, double* FlatCenPts, double* FlatRtgSizes, int ns, double* M);
 
-///** Creates triangulated extruded polygon block, i.e. an extruded polygon with its bases subdivided by triangulation.
-//@param n [out] reference number of the object created
-//@param xc [in] the horizontal coordinate of the block center of gravity
-//@param lx [in] the thickness (extrusion size)
-//@param FlatVert [in] flat array of y and z coordinates (y1, z1, y2, z2,...) of vertex points describing the polygon in 2D
-//@param FlatSubd [in] flat array of subdivision parameters for base polygon segments, two numbers for each segment: the first defining number of sub-segments, the second - "gradient" of the segmentation
-//@param nv [in] number of vertex points of the 2D polygon (the length of the FlatVert and FlatSubd arrays is 2*nv)
-//@param a [in] character identifying extrusion direction (can be 'x', 'y' or 'z')
-//@param M [in] array of 3 cartesian coordinates of the magnetization vector inside the block
-//@param opt [in] pointer to options string, which can be "TriAngMin->...", "TriAreaMax->...", "ExtOpt->..." or 0. 
-//@return integer error code (0 : no error, >0 : error number, <0 : warning number)
-//@author O.C.
-//*/
+/** Creates triangulated extruded polygon block, i.e. an extruded polygon with its bases subdivided by triangulation.
+@param n [out] reference number of the object created
+@param xc [in] the horizontal coordinate of the block center of gravity
+@param lx [in] the thickness (extrusion size)
+@param FlatVert [in] flat array of y and z coordinates (y1, z1, y2, z2,...) of vertex points describing the polygon in 2D
+@param FlatSubd [in] flat array of subdivision parameters for base polygon segments, two numbers for each segment: the first defining number of sub-segments, the second - "gradient" of the segmentation
+@param nv [in] number of vertex points of the 2D polygon (the length of the FlatVert and FlatSubd arrays is 2*nv)
+@param a [in] character identifying extrusion direction (can be 'x', 'y' or 'z')
+@param M [in] array of 3 cartesian coordinates of the magnetization vector inside the block
+@param opt [in] pointer to options string, which can be e.g. "ki->...,TriAngMin->...,TriAreaMax->...,ExtOpt->..." or each of these tokens separately, or 0; default values are "ki->Numb" (rather than "ki->Size"), "TriAngMin->20"
+@return integer error code (0 : no error, >0 : error number, <0 : warning number)
+@author O.C.
+*/
 EXP int CALL RadObjMltExtTri(int* n, double xc, double lx, double* FlatVert, double* FlatSubd, int nv, char a, double* M, char* opt);
 
 /** Creates a finite-length arc magnet of rectangular cross-section.
@@ -333,6 +333,7 @@ EXP int CALL RadObjAddToCnt(int cnt, int* Objs, int nobj);
 /** Calculates the number of objects in the container cnt.
 @param n [out] calculated number of objects
 @param cnt [in] reference number of the container object
+@param deep [in] switch specifying whether all atomic elements of eventual member containers have to be counted (1) or not (0, default)
 @return integer error code (0 : no error, >0 : error number, <0 : warning number)
 @author O.C.
 */
@@ -355,26 +356,30 @@ EXP int CALL RadObjCntStuf(int* Objs, int cnt);
 */
 EXP int CALL RadObjDpl(int* n, int obj, char* opt);
 
-/** Provides coordinates of geometrical center point and magnetization of the object obj.
-@param M [out] flat array of coordinates of geometrical center point(s) and magnetization components. If obj is a container, the array includes the container members' center points and their magnetizations. The array should be allocated in the calling application. The necessary size of the array is 6 times the size specified by the function RadObjCntSize.
+/** Provides coordinates of geometrical center point(s) and magnetization(s) of the object obj.
+@param M [out] flat array of resulting magnetization array. If this pointer is 0 at input, the actual output data array can be obtained by calling RadUtiDataGet function. This aray will contain coordinates of geometrical center point(s) and magnetic field components. If obj is a container, the array will include the container members' center points and their magnetic field components. 
+@param arMesh [out] flat array defining the structure of resulting magnetization array, i.e. number of dimensions (arMesh[0]) and number of values per dimension. The actual output data array can be obtained by calling RadUtiDataGet function. This aray will contain coordinates of geometrical center point(s) and magnetic field components. If obj is a container, the array will include the container members' center points and their magnetic field components. 
 @param obj [in] reference number of a magnetic field source object
 @return integer error code (0 : no error, >0 : error number, <0 : warning number)
 @author O.C.
 */
-EXP int CALL RadObjM(double* M, int obj);
+EXP int CALL RadObjM(double* M, int* arMesh, int obj); //OC27092018
+//EXP int CALL RadObjM(double* M, int obj);
 
-/** Provides coordinates of geometrical center point and magnetization of the object obj.
-@param B [out] flat array of coordinates of geometrical center point(s) and magnetic field characteristic components. If obj is a container, the array includes the container members' center points and their magnetic field characteristics. The array should be allocated in the calling application. The necessary size of the array is 6 times the size specified by the function RadObjCntSize.
+/** Provides coordinates of geometrical center point and magnetic field at that point.
+@param B [out] flat array of resulting center point coordinates and field values. If this pointer is 0 at input, the actual output data array can be obtained by calling RadUtiDataGet function. This aray will contain coordinates of geometrical center point(s) and magnetic field components. If obj is a container, the array will include the container members' center points and their magnetic field components. 
+@param arMesh [out] flat array defining the structure of resulting field array, i.e. number of dimensions (arMesh[0]) and number of values per dimension. The actual output data array can be obtained by calling RadUtiDataGet function. This aray will contain coordinates of geometrical center point(s) and magnetic field components. If obj is a container, the array will include the container members' center points and their magnetic field components. 
 @param obj [in] reference number of a magnetic field source object
 @param type [in] character identifying type of a magnetic field characteristic to return (can be 'A' or 'B' or 'H' or 'J' or 'M')
 @return integer error code (0 : no error, >0 : error number, <0 : warning number)
 @author O.C.
 */
-EXP int CALL RadObjCenFld(double* B, int obj, char type);
+EXP int CALL RadObjCenFld(double* B, int* arMesh, int obj, char type); //OC27092018
+//EXP int CALL RadObjCenFld(double* B, int obj, char type);
 
-/** Provides coordinates of geometrical center point and magnetization of the object obj.
+/** Sets magnetization of the object obj.
 @param obj [in] reference number of a magnetic field source object
-@param M [out] flat array of 3 components of the magnetization vector
+@param M [in] flat array of 3 components of the magnetization vector
 @return integer error code (0 : no error, >0 : error number, <0 : warning number)
 @author O.C.
 */
@@ -432,6 +437,14 @@ EXP int CALL RadObjGeoVol(double* v, int obj);
 @author O.C.
 */ 
 EXP int CALL RadObjGeoLim(double* L, int obj);
+
+/** Gives number of degrees of freedom for the relaxation of an object.
+@param num [out] number of degrees of freedom
+@param obj [in] reference number of a 3D object
+@return integer error code (0 : no error, >0 : error number, <0 : warning number)
+@author O.C.
+*/
+EXP int CALL RadObjDegFre(int* num, int obj);
 
 /** Starts an application for viewing of 3D geometry of the object obj. The viewer is based on the QuickDraw 3D graphics library. 
 @param obj [in] reference number of the object to be viewed
@@ -965,7 +978,8 @@ EXP int CALL RadUtiDelAll(int* n);
 @author O.C.
 */
 //EXP int CALL RadUtiDmp(char* OutStr, int obj);
-EXP int CALL RadUtiDmp(char* OutStr, int* arObj, int nObj, char* AscOrBin);
+//EXP int CALL RadUtiDmp(char* OutStr, int* arObj, int nObj, char* AscOrBin);
+EXP int CALL RadUtiDmp(char* OutStr, int* pSize, int* arObj, int nObj, char* AscOrBin); //OC01102018
 
 /** Outputs information about object obj after reading it from internal buffer.
 @param OutStr [out] string containing information about obj
@@ -973,7 +987,7 @@ EXP int CALL RadUtiDmp(char* OutStr, int* arObj, int nObj, char* AscOrBin);
 @return integer error code (0 : no error, >0 : error number, <0 : warning number)
 @author O.C.
 */
-EXP int CALL RadUtiDmpRead(char* OutStr, char* AscOrBin);
+//EXP int CALL RadUtiDmpRead(char* OutStr, char* AscOrBin);
 
 /** Gives necessary length of the string to include dump information about object obj.
 @param size [out] size of string containing information about obj
@@ -984,8 +998,11 @@ EXP int CALL RadUtiDmpRead(char* OutStr, char* AscOrBin);
 @return integer error code (0 : no error, >0 : error number, <0 : warning number)
 @author O.C.
 */
-//EXP int CALL RadUtiDmpSize(int* size, int Elem);
-EXP int CALL RadUtiDmpSize(int* size, int* arElem, int nElem, char* AscOrBin, bool doEraseBuf);
+//EXP int CALL RadUtiDmpSize(int* size, int* arElem, int nElem, char* AscOrBin, bool doEraseBuf);
+////EXP int CALL RadUtiDmpSize(int* size, int Elem);
+
+
+EXP int CALL RadUtiDmpPrs(int* arElem, int* nElem, unsigned char* sBytes, int nBytes); //OC01102018
 
 /** Sets interruption time quanta in seconds for platforms with no preemptive multitasking.
 @param t [in] interruption time quanta [s]
@@ -993,6 +1010,17 @@ EXP int CALL RadUtiDmpSize(int* size, int* arElem, int nElem, char* AscOrBin, bo
 @author P.E., O.C.
 */
 EXP int CALL RadUtiIntrptTim(double* d, double t);
+
+/** Returns data resulting from previous calculations in cases when the data size was not known 'a priori', e.g. after executing functions RadObjM, RadObjCenFld, RadUtiDmp,...
+@param size [out] pointer to the resulting data (to be allocated in calling function)
+@param typeData [in] string identifying type of the data: \"mad\" for multi-dim. array of double, \"mai\" for multi-dim. array of integer, \"bin\" for byte array, \"asc\" for ASCII string, \"d\" for double, \"i\" for integer
+@param key [in] additional identifier of the data to be extracted, e.g. to ensure thread safety (not implemented yet)
+@return integer error code (0 : no error, >0 : error number, <0 : warning number)
+@author O.C.
+*/
+EXP int CALL RadUtiDataGet(char* pcData, const char typeData[3], long key=0); //OC04102018
+//EXP int CALL RadUtiDataGet(char* pcData, char typeData[3], long key=0); //OC27092018
+//EXP int CALL RadUtiDataGet(double* pData, long key); //OC15092018
 
 /** Identifies the version number of the Radia DLL.
 @param d [out] version number
