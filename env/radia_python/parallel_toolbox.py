@@ -58,7 +58,7 @@ def compute_fields(points_list, radia_object_id = None, field_component = 'bz'):
         indices = np.lexsort((data_out[:,0], data_out[:,1], data_out[:,2]))
         data_out = [data_out[i,:]for i in indices]
 
-        return data_out
+        return np.asarray(data_out)
 
     else:
         return None
