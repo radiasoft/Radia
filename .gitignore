@@ -1,4 +1,9 @@
 *~
 html/
 latex/
+
+radia.so
+lib*.a
 *.pyc
+uti_plot-*.png
+
